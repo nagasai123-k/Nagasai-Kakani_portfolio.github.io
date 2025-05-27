@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <title>Sri Venkata Naga Sai Kakani | Code Cartographer</title>
+    <style>
+        /* Global Styles */
+        :root {
+            --primary-color: #0a192f; /* Deep blue - cartographer's night sky */
+            --secondary-color: #64ffda; /* Bright cyan - glowing nodes/paths */
+            --light-slate: #ccd6f6; /* Lighter text */
+            --slate: #8892b0; /* Medium text/icons */
+            --dark-slate: #495670; /* Darker accents */
+            --lightest-navy: #233554; /* Card backgrounds, slightly lighter than primary */
+            --background-lines: rgba(136, 146, 176, 0.1); /* Faint blueprint lines */
+            --font-sans: 'Calibri', 'San Francisco', 'SF Pro Text', -apple-system, system-ui, sans-serif;
+            --font-mono: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace;
+            --transition-speed: 0.3s;
+            --easing: ease-in-out;
+        }
+
+        ::selection {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-sans);
+            background-color: var(--primary-color);
+            color: var(--slate);
+            line-height: 1.6;
+            /* Subtle blueprint grid background */
+            background-image:
+                linear-gradient(var(--background-lines) 1px, transparent 1px),
+                linear-gradient(to right, var(--background-lines) 1px, transparent 1px);
+            background-size: 25px 25px; /* Slightly larger grid */
+            overflow-x: hidden; /* Prevent horizontal scrollbars from animations */
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 25px; /* Increased padding */
+        }
+
+        /* Scrollbar Styling (Optional, but adds to the theme) */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--primary-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--dark-slate);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--slate);
+        }
+
+        header {
+            padding: 15px 0; /* Reduced padding */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: rgba(10, 25, 47, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            transition: top var(--transition-speed) var(--easing), box-shadow var(--transition-speed) var(--easing);
+            box-shadow: none; /* Initially no shadow */
+        }
+
+        header.scrolled {
+            box-shadow: 0 5px 15px rgba(2, 12, 27, 0.7);
+            padding: 10px 0; /* Slightly reduce padding on scroll */
+        }
+
+        .logo a {
+            font-family: var(--font-mono);
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-size: 1.8em; /* Slightly larger */
+            font-weight: bold;
+            padding-left: 25px;
+            transition: opacity var(--transition-speed) var(--easing);
+        }
+        .logo a:hover {
+            opacity: 0.8;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: center; /* Align items vertically for button */
+        }
+
+        nav ul li {
+            margin-left: 20px; /* Adjusted spacing */
+        }
+
+        nav ul li:last-child {
+            padding-right: 25px;
+        }
+
+        nav ul li a {
+            color: var(--light-slate);
+            text-decoration: none;
+            font-family: var(--font-mono);
+            font-size: 0.90em; /* Adjusted for more items */
+            padding: 10px;
+            transition: color var(--transition-speed) var(--easing);
+            position: relative;
+        }
+        /* Underline effect for nav links */
+        nav ul li a:not(.button)::after { /* Exclude button from this underline effect */
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--secondary-color);
+            transition: width var(--transition-speed) var(--easing);
+        }
+
+        nav ul li a:not(.button):hover::after,
+        nav ul li a.active:not(.button)::after {
+            width: calc(100% - 20px); /* Adjust based on padding */
+        }
+
+        nav ul li a:hover:not(.button), /* Exclude button from this hover color */
+        nav ul li a.active:not(.button) {
+            color: var(--secondary-color);
+        }
+
+        /* Styling for the Resume button in Nav */
+        nav ul li a.resume-link.button {
+            color: var(--secondary-color);
+            border: 1px solid var(--secondary-color);
+            padding: 8px 15px; /* Adjust padding to fit nav bar */
+            border-radius: 4px;
+            margin-left: 15px; /* Spacing from other nav items */
+            font-size: 0.85em; /* Slightly smaller to fit */
+            transition: background-color var(--transition-speed) var(--easing), color var(--transition-speed) var(--easing);
+        }
+
+        nav ul li a.resume-link.button:hover {
+            background-color: rgba(100, 255, 218, 0.1);
+            color: var(--secondary-color); /* Ensure text color remains on hover */
+        }
+
+
+        section {
+            padding: 120px 0; /* Increased padding for fixed header */
+            min-height: 80vh;
+            border-bottom: 1px solid var(--dark-slate);
+            /* For scroll animations */
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s var(--easing), transform 0.6s var(--easing);
+        }
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        section:last-of-type {
+            border-bottom: none;
+        }
+
+        h1, h2, h3 {
+            color: var(--light-slate);
+            margin-top: 0; /* Remove default top margin */
+            margin-bottom: 25px; /* Increased margin */
+        }
+
+        h1 {
+            font-size: clamp(40px, 7vw, 70px);
+            line-height: 1.1;
+            font-weight: 600;
+        }
+
+        h2 {
+            font-size: clamp(28px, 5vw, 36px); /* Slightly smaller */
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            margin-bottom: 40px; /* More space after H2 */
+        }
+
+        h2::before {
+            content: '0' counter(section) '.';
+            counter-increment: section;
+            margin-right: 15px; /* Increased margin */
+            font-family: var(--font-mono);
+            font-size: 0.6em; /* Smaller */
+            color: var(--secondary-color);
+            font-weight: normal;
+        }
+
+        p {
+            margin-bottom: 20px;
+            max-width: 700px; /* Readable line length */
+        }
+
+        /* Utility Classes */
+        .highlight {
+            color: var(--secondary-color);
+        }
+
+        .button {
+            display: inline-flex; /* Changed to inline-flex for icon alignment */
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary-color);
+            background-color: transparent;
+            border: 1px solid var(--secondary-color);
+            padding: 14px 28px; 
+            border-radius: 4px;
+            text-decoration: none;
+            font-family: var(--font-mono);
+            font-size: 1em;
+            transition: background-color var(--transition-speed) var(--easing), color var(--transition-speed) var(--easing), transform var(--transition-speed) var(--easing);
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(100, 255, 218, 0.1);
+        }
+
+        .button:hover {
+            background-color: rgba(100, 255, 218, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(100, 255, 218, 0.2);
+        }
+
+        .button svg { /* Styling for SVGs inside buttons */
+            width: 1.2em; /* Adjust size as needed */
+            height: 1.2em;
+            fill: currentColor; /* Inherits color from parent (button text color) */
+        }
+
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px 20px; /* Increased padding */
+            font-family: var(--font-mono);
+            font-size: 0.85em; /* Slightly larger */
+            color: var(--slate);
+            border-top: 1px solid var(--dark-slate);
+        }
+
+        footer a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: opacity var(--transition-speed) var(--easing);
+        }
+        footer a:hover {
+            opacity: 0.8;
+        }
+
+        /* Hero Section Styles */
+        .hero-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding-top: 0;
+            padding-bottom: 0;
+            position: relative;
+            counter-reset: section 0;
+            opacity: 1; /* Hero is visible by default */
+            transform: translateY(0);
+        }
+        .hero-section .container {
+            padding-top: 80px; /* Account for header */
+        }
+
+        .hero-intro {
+            font-family: var(--font-mono);
+            font-size: clamp(1em, 2vw, 1.2em);
+            margin-bottom: 25px;
+            color: var(--secondary-color);
+            opacity: 0; /* For animation */
+            transform: translateY(20px); /* For animation */
+            animation: fadeInSlideUp 0.5s var(--easing) 0.2s forwards;
+        }
+
+        .hero-name {
+            color: var(--light-slate);
+            margin-bottom: 10px;
+            line-height: 1.1;
+            min-height: 80px; /* Reserve space for text */
+            opacity: 0; /* For animation */
+            transform: translateY(20px); /* For animation */
+            animation: fadeInSlideUp 0.5s var(--easing) 0.4s forwards;
+        }
+        .hero-name .cursor { /* Typing cursor */
+            display: inline-block;
+            width: 3px;
+            height: 1em; /* Match surrounding text size */
+            background-color: var(--secondary-color);
+            animation: blink 1s step-end infinite;
+            margin-left: 2px;
+            position: relative; /* To align with text baseline */
+            bottom: -0.15em; /* Adjust as needed for font */
+        }
+
+
+        .hero-tagline {
+            font-size: clamp(28px, 5.5vw, 45px);
+            color: var(--slate);
+            margin-bottom: 30px;
+            line-height: 1.2;
+            min-height: 50px; /* Reserve space */
+            opacity: 0; /* For animation */
+            transform: translateY(20px); /* For animation */
+            animation: fadeInSlideUp 0.5s var(--easing) 0.6s forwards;
+        }
+        .hero-tagline::before {
+            content: "";
+            margin-right: 0;
+        }
+        .hero-tagline .cursor { /* Typing cursor for tagline */
+            display: inline-block;
+            width: 3px;
+            height: 0.8em; /* Adjust based on tagline font size */
+            background-color: var(--secondary-color);
+            animation: blink 1s step-end infinite;
+            margin-left: 2px;
+            position: relative;
+            bottom: -0.1em;
+        }
+
+
+        .hero-bio {
+            font-size: clamp(1em, 2.2vw, 1.15em);
+            max-width: 650px;
+            margin-bottom: 30px; /* Adjusted margin */
+            color: var(--slate);
+            opacity: 0; /* For animation */
+            transform: translateY(20px); /* For animation */
+            animation: fadeInSlideUp 0.5s var(--easing) 0.8s forwards;
+        }
+
+        .hero-cta-buttons {
+            margin-top: 20px; /* Add some space above the button group */
+            opacity: 0; /* For animation */
+            transform: translateY(20px); /* For animation */
+            animation: fadeInSlideUp 0.5s var(--easing) 0.9s forwards; /* Animation for the group */
+            display: flex; /* Allow buttons to be side-by-side or wrap */
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            align-items: center; /* Align items nicely if they wrap */
+            gap: 15px; /* Consistent gap between all buttons in the CTA area */
+        }
+
+        .hero-social-links {
+            /* margin-bottom: 20px; Removed margin-bottom as gap handles spacing */
+            display: flex;
+            gap: 15px; /* Space between social buttons */
+        }
+
+        .hero-social-button {
+            padding: 10px; /* Adjusted padding for smaller icon-only button */
+            min-width: 44px; /* Ensure a decent tap target size */
+            min-height: 44px;
+            font-size: 1em; /* Base for SVG sizing */
+        }
+        .hero-social-button svg {
+            width: 20px; /* Specific size for hero icons - MADE SMALLER */
+            height: 20px; /* Specific size for hero icons - MADE SMALLER */
+        }
+
+
+        .hero-button { /* This is the "Chart My Work" button */
+            padding: 16px 30px; /* Slightly adjusted for balance */
+            font-size: 1.05em; /* Slightly adjusted for balance */
+        }
+
+        @keyframes fadeInSlideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes blink {
+            from, to { background-color: transparent }
+            50% { background-color: var(--secondary-color); }
+        }
+
+
+        /* Section Heading Numbering */
+        #about h2::before { content: '01.'; }
+        #experience h2::before { content: '02.'; }
+        #projects h2::before { content: '03.'; }
+        #skills h2::before { content: '04.'; }
+        #certifications h2::before { content: '05.'; }
+        #contact h2::before { content: '06.'; }
+
+        /* Experience Section */
+        .experience-item {
+            margin-bottom: 35px;
+            padding-left: 25px;
+            border-left: 3px solid var(--secondary-color);
+            position: relative;
+        }
+        .experience-item::before { /* Dot on the timeline */
+            content: '';
+            position: absolute;
+            left: -9px; /* Adjust based on border-left width */
+            top: 5px;
+            width: 15px;
+            height: 15px;
+            background-color: var(--secondary-color);
+            border-radius: 50%;
+            border: 3px solid var(--primary-color);
+        }
+        .experience-item h3 {
+            margin-bottom: 8px;
+            font-size: 1.5em;
+        }
+        .experience-details {
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+            color: var(--slate);
+            margin-bottom: 12px;
+        }
+        .experience-item ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .experience-item ul li {
+            padding-left: 20px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+        .experience-item ul li::before {
+            content: '▹';
+            position: absolute;
+            left: 0;
+            color: var(--secondary-color);
+        }
+
+        /* Projects Section */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        .project-card {
+            background-color: var(--lightest-navy);
+            padding: 30px;
+            border-radius: 6px;
+            border: 1px solid var(--dark-slate);
+            transition: transform var(--transition-speed) var(--easing), box-shadow var(--transition-speed) var(--easing);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Pushes tech stack to bottom */
+        }
+        .project-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 35px -15px rgba(2,12,27,0.7);
+        }
+        .project-card h3 {
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        .project-card p {
+            font-size: 0.95em;
+            margin-bottom: 15px;
+        }
+        .project-card .tech-stack {
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            color: var(--slate);
+            margin-top: auto; /* Pushes to bottom */
+            padding-top: 15px; /* Space above tech stack */
+            border-top: 1px solid var(--dark-slate); /* Separator */
+        }
+        .project-card .tech-stack .highlight {
+            font-weight: bold;
+        }
+        .project-links a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-family: var(--font-mono);
+            margin-right: 15px;
+            font-size: 0.9em;
+        }
+        .project-links a:hover {
+            text-decoration: underline;
+        }
+
+
+        /* Skills Section */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        .skill-category {
+            background-color: var(--lightest-navy);
+            padding: 25px;
+            border-radius: 6px;
+            border: 1px solid var(--dark-slate);
+        }
+        .skill-category h3 {
+            color: var(--secondary-color);
+            font-family: var(--font-mono);
+            font-size: 1.25em;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--dark-slate);
+            padding-bottom: 10px;
+        }
+        .skill-category ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .skill-category ul li {
+            margin-bottom: 10px;
+            padding-left: 22px;
+            position: relative;
+            transition: color var(--transition-speed) var(--easing);
+        }
+        .skill-category ul li:hover {
+            color: var(--secondary-color);
+        }
+        .skill-category ul li::before {
+            content: '▹';
+            position: absolute;
+            left: 0;
+            color: var(--secondary-color);
+            transition: transform var(--transition-speed) var(--easing);
+        }
+        .skill-category ul li:hover::before {
+            transform: translateX(3px);
+        }
+
+
+        /* Certifications Section */
+        .certifications-list {
+            list-style: none;
+            padding-left: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .certifications-list li {
+            font-family: var(--font-mono);
+            font-size: 1em;
+            padding: 20px;
+            background-color: var(--lightest-navy);
+            border-left: 4px solid var(--secondary-color);
+            border-radius: 0 4px 4px 0;
+            transition: transform var(--transition-speed) var(--easing), box-shadow var(--transition-speed) var(--easing);
+        }
+        .certifications-list li:hover {
+            transform: translateX(5px);
+            box-shadow: 5px 5px 15px rgba(2,12,27,0.5);
+        }
+
+        /* Contact Section */
+        .contact-content p {
+            font-size: 1.1em;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+        }
+        .contact-links {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .contact-links a {
+            color: var(--secondary-color);
+            font-family: var(--font-mono);
+            font-size: 1.1em;
+            margin: 0 15px;
+            text-decoration: none;
+            transition: opacity var(--transition-speed) var(--easing);
+        }
+        .contact-links a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+        .social-links { /* This class is used in the contact section */
+            text-align: center;
+            margin-top: 40px;
+        }
+        .social-links .button { /* Styles for social buttons in contact section */
+            margin: 10px;
+        }
+        .social-links .button svg { /* If using icons in contact section buttons */
+             width: 1.2em; 
+            height: 1.2em;
+            margin-right: 8px; /* Space between icon and text if any */
+        }
+
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            nav ul {
+            }
+             nav ul li:not(:last-child) { 
+                display: none; 
+            }
+            nav ul li a.resume-link.button { 
+                 margin-left: auto; 
+            }
+
+
+            .logo a { font-size: 1.5em; }
+            .hero-name { font-size: clamp(35px, 10vw, 50px); }
+            .hero-tagline { font-size: clamp(24px, 7vw, 35px); }
+            h2 { font-size: clamp(24px, 6vw, 30px); }
+            .projects-grid, .skills-grid, .certifications-list {
+                grid-template-columns: 1fr; /* Stack on smaller screens */
+            }
+            
+            .hero-cta-buttons {
+                 flex-direction: column; /* Stack all CTA items vertically */
+                 align-items: flex-start; /* Align them to the left */
+                 gap: 15px; 
+            }
+            .hero-social-links {
+                /* Already display:flex, gap:15px from .hero-cta-buttons if it's a direct child, or keep its own */
+                /* No need to change much here if parent .hero-cta-buttons handles stacking */
+                width: 100%; /* Make the social links container take full width to align items within it */
+                justify-content: flex-start; /* Align social buttons to the start of their container */
+            }
+            .hero-social-links .button { /* Icon buttons */
+                /* width: auto; Let them size to content (icon) */
+                /* padding: 10px; Adjust padding for smaller icon buttons */
+            }
+             .hero-social-links .button svg {
+                /* width: 20px; */
+                /* height: 20px; */
+            }
+             .hero-cta-buttons .hero-button { /* Chart My Work button */
+                width: 100%;
+                text-align: center;
+                max-width: 280px; 
+             }
+        }
+         @media (max-width: 480px) { /* Further adjustments for very small screens */
+            nav ul li a.resume-link.button {
+                padding: 6px 10px;
+                font-size: 0.75em;
+            }
+             .hero-intro { font-size: 0.9em; }
+             .hero-name { font-size: clamp(30px, 10vw, 40px); min-height: 60px;}
+             .hero-tagline { font-size: clamp(20px, 7vw, 30px); min-height: 40px;}
+             .hero-bio { font-size: 0.95em; }
+             .button { padding: 12px 20px; font-size: 0.9em; }
+             .hero-button { padding: 15px 25px; font-size: 1em;}
+             
+             .hero-social-button { 
+                padding: 8px; /* Smaller padding for very small screens */
+                min-width: 40px;
+                min-height: 40px;
+             }
+             .hero-social-button svg {
+                width: 18px; /* Slightly smaller icons */
+                height: 18px;
+             }
+             .hero-social-links { width: auto; } 
+             .hero-cta-buttons .hero-button { max-width: 100%; }
+
+
+        }
+
+
+    </style>
+</head>
+<body>
+    <header id="site-header">
+        <div class="logo">
+            <a href="#">SVK</a>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#experience" class="nav-link">Experience</a></li>
+                <li><a href="#projects" class="nav-link">Projects</a></li>
+                <li><a href="#skills" class="nav-link">Skills</a></li>
+                <li><a href="#certifications" class="nav-link">Certifications</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+                <li><a href="https://drive.google.com/file/d/1h0QZ7CuDQ8cQcvz9GHQ7QW7TDzDKf1eK/view?usp=sharing" target="_blank" class="nav-link resume-link button">Resume</a></li> </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero" class="hero-section">
+            <div class="container">
+                <p class="hero-intro">Hi, my name is</p>
+                <h1 class="hero-name" id="heroNameTextElement">Naga Sai Kakani.<span class="cursor" id="heroNameCursor"></span></h1>
+                <h2 class="hero-tagline" id="heroTaglineTextElement">I map innovative solutions with code.<span class="cursor" id="heroTaglineCursor"></span></h2>
+                <p class="hero-bio">
+                    I'm a <span class="highlight">Master's student in Computer Science</span> at Georgia State University and a <span class="highlight">Graduate Teaching Assistant</span>, passionate about architecting robust systems and exploring the frontiers of technology, from distributed algorithms on Azure to serverless pipelines on AWS.
+                </p>
+                <div class="hero-cta-buttons">
+                    <div class="hero-social-links">
+                        <a href="https://linkedin.com/in/nagasai-kakani" target="_blank" class="button hero-social-button" aria-label="LinkedIn Profile">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"></path></svg>
+                        </a>
+                        <a href="https://github.com/nagasail23-k" target="_blank" class="button hero-social-button" aria-label="GitHub Profile">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+                        </a>
+                    </div>
+                    <a href="#projects" class="button hero-button">Chart My Work</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="observe-me">
+            <div class="container">
+                <h2>About Me</h2>
+                <p>As a Graduate Teaching Assistant at Georgia State University (expected graduation: May 2026), I've focused on developing concepts and interactive projects for students in Operating Systems and Principles of Computer Science I courses. I enjoy helping students interpret and visualize complex concepts. My journey into tech is driven by a passion for problem-solving and continuous learning.</p>
+                <p>Prior to my Master's, I gained industry experience as a Software Engineer Intern, contributing to a Node.js and React-based internal communication platform at IBEE Software Solutions, which led to a 20% increase in daily active users. At Teach Agnostics Pvt. Ltd, I developed RESTful APIs enhancing content management efficiency by 40% and managed cloud-hosted databases achieving 99.9% uptime.</p>
+            </div>
+        </section>
+
+        <section id="experience" class="observe-me">
+            <div class="container">
+                <h2>Experience</h2>
+                <div class="experience-item">
+                    <h3>Graduate Teaching Assistant</h3>
+                    <p class="experience-details"><span class="highlight">Georgia State University</span> | Atlanta, USA | Aug 2024 – Present</p>
+                    <ul>
+                        <li>Assisted in teaching Operating Systems and Principles of Computer Science I.</li>
+                        <li>Developed concepts and interactive projects, enhancing student engagement.</li>
+                        <li>Provided one-on-one tutoring, aiding concept visualization and understanding.</li>
+                    </ul>
+                </div>
+                <div class="experience-item">
+                    <h3>Software Engineer Intern</h3>
+                    <p class="experience-details"><span class="highlight">Teach Agnostics Pvt. Ltd</span> | Chennai, India | Sep 2023 – Dec 2023</p>
+                    <ul>
+                        <li>Developed RESTful APIs: boosted content management efficiency by 40%, user authentication speed by 30%.</li>
+                        <li>Managed cloud databases: ensured 99.9% uptime, supported 50% user load increase.</li>
+                    </ul>
+                </div>
+                 <div class="experience-item">
+                    <h3>Software Engineer Intern</h3>
+                    <p class="experience-details"><span class="highlight">IBEE Software Solution Pvt. Ltd</span> | Hyderabad, India | Jun 2023 – Sep 2023</p>
+                    <ul>
+                        <li>Contributed to a Node.js & React internal communication platform.</li>
+                        <li>Enhanced features leading to a 20% rise in daily active users.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="observe-me">
+            <div class="container">
+                <h2>Projects</h2>
+                <div class="projects-grid">
+                    <div class="project-card">
+                        <div>
+                            <h3>Spark-Based Dijkstra's Algorithm on Azure</h3>
+                            <p>Developed a distributed Dijkstra's algorithm (Spark RDDs on Azure) for graphs (10K nodes/100K edges), achieving 30% faster convergence. Built optimized PySpark pipelines for shortest path computation.</p>
+                        </div>
+                        <div>
+                            <p class="tech-stack">Tech: <span class="highlight">Apache Spark, PySpark, Python, Azure</span></p>
+                            </div>
+                    </div>
+                    <div class="project-card">
+                        <div>
+                            <h3>Serverless Document Processing Pipeline</h3>
+                            <p>Automated CSV metadata extraction via a serverless ETL pipeline (AWS Lambda, Pandas), cutting effort by 90%. Deployed scalable infrastructure (AWS CDK), stored results in DynamoDB, ensuring 99.9% reliability (SQS, DLQ).</p>
+                        </div>
+                        <div>
+                            <p class="tech-stack">Tech: <span class="highlight">AWS Lambda, S3, SQS, DynamoDB, Python, CDK</span></p>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <div>
+                            <h3>Palm Vein Authentication System</h3>
+                            <p>Cloud-based biometric authentication (Flask, FastAPI) with SHA-512 & OAuth2.0, reducing unauthorized access by 60%. Upgraded from Canny Edge to a CNN model (TensorFlow Serving on AWS EC2), boosting accuracy by 30%.</p>
+                        </div>
+                        <div>
+                           <p class="tech-stack">Tech: <span class="highlight">Python, Flask, AWS, MongoDB, CNN</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills" class="observe-me">
+            <div class="container">
+                <h2>Skills</h2>
+                <div class="skills-grid">
+                    <div class="skill-category">
+                        <h3>Languages</h3>
+                        <ul>
+                            <li>Python</li><li>Java</li><li>JavaScript</li><li>TypeScript</li>
+                            <li>C/C++</li><li>Dart</li><li>Unix Shell Script</li>
+                        </ul>
+                    </div>
+                    <div class="skill-category">
+                        <h3>Frameworks & Libraries</h3>
+                        <ul>
+                            <li>React JS</li><li>Node JS</li><li>Express JS</li>
+                            <li>Pandas</li><li>NumPy</li><li>Matplotlib</li>
+                        </ul>
+                    </div>
+                    <div class="skill-category">
+                        <h3>Web Technologies</h3>
+                        <ul>
+                            <li>HTML5</li><li>CSS3</li><li>React</li><li>Angular</li><li>PHP</li>
+                        </ul>
+                    </div>
+                    <div class="skill-category">
+                        <h3>Cloud & Databases</h3>
+                        <ul>
+                            <li>AWS (Lambda, S3, SQS, DynamoDB, EC2)</li><li>Azure (VMs)</li>
+                            <li>MongoDB</li><li>MySQL</li><li>PostgreSQL</li><li>RDBMS</li>
+                        </ul>
+                    </div>
+                     <div class="skill-category">
+                        <h3>Tools & Platforms</h3>
+                        <ul>
+                            <li>Git & GitHub</li><li>VS Code</li><li>Firebase</li>
+                            <li>Linux</li><li>Docker</li><li>AWS CDK</li><li>Apache Spark</li>
+                        </ul>
+                    </div>
+                    <div class="skill-category">
+                        <h3>Methodologies</h3>
+                        <ul>
+                            <li>Agile</li><li>Scrum</li><li>Kanban</li>
+                            <li>TDD</li><li>BDD</li><li>Code Reviews</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="certifications" class="observe-me">
+            <div class="container">
+                <h2>Certifications</h2>
+                <ul class="certifications-list">
+                    <li>Cloud Practitioner by AWS</li>
+                    <li>Amazon DynamoDB by AWS</li>
+                    <li>Git Essential Training by LinkedIn</li>
+                    <li>Introduction to Data Analytics by IBM</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="contact" class="observe-me">
+            <div class="container contact-content">
+                <h2>Contact</h2>
+                <p>I'm always excited to discuss new projects, innovative ideas, or opportunities to collaborate. Feel free to reach out!</p>
+                <div class="contact-links">
+                    <p>Email: <a href="mailto:nagasaikakani25@gmail.com" class="highlight">nagasaikakani25@gmail.com</a></p>
+                    <!-- <p>Phone: <a href="tel:4703999815" class="highlight">470-399-9815</a></p> -->
+                </div>
+                <div class="social-links"> <a href="https://linkedin.com/in/nagasai-kakani" target="_blank" class="button">LinkedIn</a>
+                    <a href="https://github.com/nagasail23-k" target="_blank" class="button">GitHub</a>
+                    <a href="https://nagasaikakani.framer.website" target="_blank" class="button">My Framer Site</a> </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; <span id="currentYear"></span> Naga Sai Kakani. Crafted with code &amp; coffee.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Smooth scrolling for nav links
+            const navLinks = document.querySelectorAll('nav a[href^="#"]');
+            navLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    // Check if it's the resume link
+                    if (this.classList.contains('resume-link')) {
+                        window.open(targetId, '_blank'); // Open resume in new tab
+                        return; 
+                    }
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start' 
+                        });
+                    }
+                });
+            });
+
+            // Header behavior on scroll
+            const header = document.getElementById('site-header');
+            let lastScrollTop = 0;
+            window.addEventListener('scroll', function() {
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                if (scrollTop > 50) { // Add scrolled class after 50px scroll
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+
+                if (scrollTop > lastScrollTop && scrollTop > header.offsetHeight + 50) { // Hide header on scroll down
+                    header.style.top = `-${header.offsetHeight}px`;
+                } else { // Show header on scroll up
+                    header.style.top = '0';
+                }
+                lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; 
+            }, false);
+
+
+            // Active nav link highlighting on scroll
+            const sections = document.querySelectorAll("section[id]");
+            const navLiAnchors = document.querySelectorAll("nav ul li a:not(.resume-link)"); // Exclude resume link from active highlighting
+            
+            function updateActiveNavLink() {
+                let currentSectionId = "";
+                sections.forEach((section) => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    // Adjust offset for fixed header
+                    if (pageYOffset >= (sectionTop - header.offsetHeight - 100) && pageYOffset < (sectionTop + sectionHeight - header.offsetHeight - 100) ) { // Increased offset for earlier activation
+                        currentSectionId = section.getAttribute("id");
+                    }
+                });
+
+                navLiAnchors.forEach((a) => {
+                    a.classList.remove("active");
+                    if (a.getAttribute("href").substring(1) === currentSectionId) {
+                        a.classList.add("active");
+                    }
+                });
+            }
+            window.addEventListener("scroll", updateActiveNavLink);
+            updateActiveNavLink(); // Initial call
+
+
+            // Intersection Observer for section animations
+            const animatedSections = document.querySelectorAll('.observe-me');
+            const observerOptions = {
+                root: null, // viewport
+                rootMargin: '0px',
+                threshold: 0.15 // 15% of section visible
+            };
+
+            const sectionObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        // observer.unobserve(entry.target); // Optional: stop observing once visible
+                    } else {
+                        // Optional: remove 'visible' class to re-animate on scroll up
+                        // entry.target.classList.remove('visible'); 
+                    }
+                });
+            }, observerOptions);
+
+            animatedSections.forEach(section => {
+                sectionObserver.observe(section);
+            });
+
+
+            // Typewriter effect for Hero section
+            function typeWriter(element, text, speed, cursorElement, callback) {
+                let i = 0;
+                if (!element) return; // Guard clause
+                element.innerHTML = ""; // Clear existing text
+                if(cursorElement) cursorElement.style.display = 'inline-block';
+
+                function type() {
+                    if (i < text.length) {
+                        element.innerHTML += text.charAt(i);
+                        i++;
+                        setTimeout(type, speed);
+                    } else {
+                        if(cursorElement) {
+                            cursorElement.style.animation = 'blink 1s step-end infinite'; 
+                        }
+                        if (callback) callback();
+                    }
+                }
+                type();
+            }
+
+            const heroNameEl = document.getElementById('heroNameTextElement');
+            const heroNameText = "Naga Sai Kakani.";
+            const heroNameCursorEl = document.getElementById('heroNameCursor');
+            
+            const heroTaglineEl = document.getElementById('heroTaglineTextElement');
+            const heroTaglineText = "I map innovative solutions with code.";
+            const heroTaglineCursorEl = document.getElementById('heroTaglineCursor');
+            
+            if(heroTaglineCursorEl) heroTaglineCursorEl.style.display = 'none'; 
+
+            setTimeout(() => {
+                typeWriter(heroNameEl, heroNameText, 70, heroNameCursorEl, () => {
+                    if(heroNameCursorEl) heroNameCursorEl.style.display = 'none'; 
+                    if(heroTaglineCursorEl) heroTaglineCursorEl.style.display = 'inline-block'; 
+                    setTimeout(() => {
+                         typeWriter(heroTaglineEl, heroTaglineText, 60, heroTaglineCursorEl, () => {
+                         });
+                    }, 300); 
+                });
+            }, 1200); 
+
+
+            // Set current year in footer
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+        });
+    </script>
+</body>
+</html>
